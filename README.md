@@ -2,7 +2,7 @@
 This repo is a custom K8S setup of the [eShopOnContainers](https://github.com/dotnet-architecture/eShopOnContainers) .NET Core microservices example. All of the container images have been prebuilt and live under the Github Organization [DataConstruct](https://github.com/DataConstruct). Filter on "sdlc-example".
 
 # setup
-IN THEORY, you should be able to run each K8S config and have a working application start up. I've removed the SSL configuration options. You can modify this example by following this [guide](https://www.digitalocean.com/community/tutorials/how-to-set-up-an-nginx-ingress-with-cert-manager-on-digitalocean-kubernetes) and updating the relevant ingress controllers. The directories and files are numbered for this specific order that they should be followed. You can `kubectl apply -f FILENAME.yml` all files. The relevant namespaces have been properly configured.
+IN THEORY, you should be able to run each K8S config and have a working application start up. I've removed the SSL configuration options. You can modify this repo by following this [guide](https://www.digitalocean.com/community/tutorials/how-to-set-up-an-nginx-ingress-with-cert-manager-on-digitalocean-kubernetes) and updating the relevant ingress controllers. The directories and files are numbered for the specific order that they should be followed. You can `kubectl apply -f FILENAME.yml` all files. The relevant namespaces have been properly configured.
 
 This example should work, IN THEORY, with minikube. You may need to do a few additional items.
 
