@@ -37,6 +37,18 @@ spec:
           value: "http://0.0.0.0:80"
         - name: ConnectionString
           value: "Server=sql-data.common-infra;Database=Microsoft.eShopOnContainers.Service.IdentityDb;User Id=sa;Password=Pass@word"
+        - name: MvcClient
+          value: "https://eshop.dataconstruct.ca"
+        - name: LocationApiClient
+          value: "http://identity.identity"
+        - name: MarketingApiClient
+          value: "http://marketing.marketing"
+        - name: BasketApiClient
+          value: "http://basket.basket"
+        - name: OrderingApiClient
+          value: "http://ordering.ordering"
+        - name: WebShoppingAggClient
+          value: "http://webshoppingagg.webshoppingagg"
         - name: UseCustomizationData
           value: "True"
         - name: ApplicationInsights__InstrumentationKey
