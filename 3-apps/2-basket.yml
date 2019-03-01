@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: basket
+  namespace: basket
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: basket
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: basket
+  namespace: basket
+spec:
+  selector:
+    matchLabels:
+      app: basket
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: basket
+    spec:
+      containers:
+      - name: basket
+        image: dataconstruct/sdlc-example-app-basket:461ddb7ada69a4879dd7d8af773b996b644d5e49
+        ports:
+        - containerPort: 80
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "Development"
+        - name: ASPNETCORE_URLS
+          value: "http://0.0.0.0:80"
+        - name: ConnectionString
+          value: "redis-data.common-infra"
+        - name: EventBusConnection
+          value: "rabbitmq.common-infra"
+        - name: AzureServiceBusEnabled
+          value: "False"
+   

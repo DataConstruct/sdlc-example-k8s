@@ -1,0 +1,99 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: webmarketingapigw
+  namespace: webmarketingapigw
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: webmarketingapigw
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: webmarketingapigw
+  namespace: webmarketingapigw
+data:
+  configuration.json: |-
+    {
+      "ReRoutes": [
+        {
+          "DownstreamPathTemplate": "/api/{version}/{everything}",
+          "DownstreamScheme": "http",
+          "DownstreamHostAndPorts": [
+            {
+              "Host": "marketing.marketing",
+              "Port": 80
+            }
+          ],
+          "UpstreamPathTemplate": "/api/{version}/m/{everything}",
+          "UpstreamHttpMethod": []
+        },
+        {
+          "DownstreamPathTemplate": "/api/{version}/{everything}",
+          "DownstreamScheme": "http",
+          "DownstreamHostAndPorts": [
+            {
+              "Host": "locations.locations",
+              "Port": 80
+            }
+          ],
+          "UpstreamPathTemplate": "/api/{version}/l/{everything}",
+          "UpstreamHttpMethod": []
+        }
+
+      ],
+      "GlobalConfiguration": {
+        "RequestIdKey": "OcRequestId",
+        "AdministrationPath": "/administration"
+      }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webmarketingapigw
+  namespace: webmarketingapigw
+spec:
+  selector:
+    matchLabels:
+      app: webmarketingapigw
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: webmarketingapigw
+    spec:
+      volumes:
+      - name: config-volume
+        configMap:
+          name: webmarketingapigw
+      containers:
+      - name: webmarketingapigw
+        image: dataconstruct/sdlc-example-infra-api-gateway-base:2a1752e290c661ed6c00a8bd2078629e29ac3534
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: config-volume
+          mountPath: /app/configuration
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "Development"
+        - name: IdentityUrl
+          value: "http://identity.identity"
+        - name: CatalogUrlHC
+          value: "http://catalog.catalog/hc"
+        - name: OrderingUrlHC
+          value: "http://ordering.ordering/hc"
+        - name: IdentityUrlHC
+          value: "http://identity.identity/hc"
+        - name: BasketUrlHC
+          value: "http://basket.basket/hc"
+        - name: MarketingUrlHC
+          value: "http://marketing.marketing/hc"
+        - name: PaymentUrlHC
+          value: "http://payment.payment/hc"
+        - name: LocationUrlHC
+          value: "http://locations.locations/hc"

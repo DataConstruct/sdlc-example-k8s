@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: identity
+  namespace: identity
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: identity
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: identity
+  namespace: identity
+spec:
+  selector:
+    matchLabels:
+      app: identity
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: identity
+    spec:
+      containers:
+      - name: identity
+        image: dataconstruct/sdlc-example-app-identity:35b468e6c12075e113351b511332d55449d83866
+        ports:
+        - containerPort: 80
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "Development"
+        - name: ASPNETCORE_URLS
+          value: "http://0.0.0.0:80"
+        - name: ConnectionString
+          value: "Server=sql-data.common-infra;Database=Microsoft.eShopOnContainers.Service.IdentityDb;User Id=sa;Password=Pass@word"
+        - name: UseCustomizationData
+          value: "True"
+        - name: ApplicationInsights__InstrumentationKey
+          value: ""
+        - name: OrchestratorType
+          value: ""
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: identity
+  namespace: identity
+  annotations:  
+    kubernetes.io/ingress.class: nginx
+spec:
+  rules:
+  - host: eshop-identity.YOUR_HOST_HERE.com
+    http:
+      paths:
+      - backend:
+          serviceName: identity
+          servicePort: 80

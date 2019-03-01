@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: marketing
+  namespace: marketing
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: marketing
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: marketing
+  namespace: marketing
+spec:
+  selector:
+    matchLabels:
+      app: marketing
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: marketing
+    spec:
+      containers:
+      - name: marketing
+        image: dataconstruct/sdlc-example-app-marketing:189c1d3171adb723f4c9815c195b4fea40d6e461
+        ports:
+        - containerPort: 80
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "Development"
+        - name: ASPNETCORE_URLS
+          value: "http://0.0.0.0:80"
+        - name: ConnectionString
+          value: "Server=sql-data.common-infra;Database=Microsoft.eShopOnContainers.Service.IdentityDb;User Id=sa;Password=Pass@word"
+        - name: MongoConnectionString
+          value: "mongodb://nosql-data.common-infra"
+        - name: MongoDatabase
+          value: "MarketingDb"
+        - name: EventBusConnection
+          value: "rabbitmq.common-infra"
+        - name: AzureServiceBusEnabled
+          value: "False"
+        - name: AzureStorageEnabled
+          value: "False"
+        - name: UseLoadTest
+          value: "False"

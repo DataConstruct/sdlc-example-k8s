@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment
+  namespace: payment
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: payment
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment
+  namespace: payment
+spec:
+  selector:
+    matchLabels:
+      app: payment
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: payment
+    spec:
+      containers:
+      - name: payment
+        image: dataconstruct/sdlc-example-app-payment:c3aa6795636d002727ee0267d37002309c246eec
+        ports:
+        - containerPort: 80
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "Development"
+        - name: ASPNETCORE_URLS
+          value: "http://0.0.0.0:80"
+        - name: EventBusConnection
+          value: "rabbitmq.common-infra"
+        - name: AzureServiceBusEnabled
+          value: "False"
+        - name: Touch
+          value: "2"

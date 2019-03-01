@@ -1,0 +1,212 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: webshoppingapigw
+  namespace: webshoppingapigw
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: webshoppingapigw
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: webshoppingapigw
+  namespace: webshoppingapigw
+data:
+  configuration.json: |-
+    {
+      "ReRoutes": [
+        {
+          "DownstreamPathTemplate": "/api/{version}/{everything}",
+          "DownstreamScheme": "http",
+          "DownstreamHostAndPorts": [
+            {
+              "Host": "catalog.catalog",
+              "Port": 80
+            }
+          ],
+          "UpstreamPathTemplate": "/api/{version}/c/{everything}",
+          "UpstreamHttpMethod": [ "GET" ]
+        },
+        {
+          "DownstreamPathTemplate": "/api/{version}/{everything}",
+          "DownstreamScheme": "http",
+          "DownstreamHostAndPorts": [
+            {
+              "Host": "basket.basket",
+              "Port": 80
+            }
+          ],
+          "UpstreamPathTemplate": "/api/{version}/b/{everything}",
+          "UpstreamHttpMethod": [],
+          "AuthenticationOptions": {
+            "AuthenticationProviderKey": "IdentityApiKey",
+            "AllowedScopes": []
+          }
+        },
+        {
+          "DownstreamPathTemplate": "/api/{version}/{everything}",
+          "DownstreamScheme": "http",
+          "DownstreamHostAndPorts": [
+            {
+              "Host": "ordering.ordering",
+              "Port": 80
+            }
+          ],
+          "UpstreamPathTemplate": "/api/{version}/o/{everything}",
+          "UpstreamHttpMethod": [],
+          "AuthenticationOptions": {
+            "AuthenticationProviderKey": "IdentityApiKey",
+            "AllowedScopes": []
+          }
+        },
+        {
+          "DownstreamPathTemplate": "/{everything}",
+          "DownstreamScheme": "http",
+          "DownstreamHostAndPorts": [
+            {
+              "Host": "webshoppingagg.webshoppingagg",
+              "Port": 80
+            }
+          ],
+          "UpstreamPathTemplate": "/{everything}",
+          "UpstreamHttpMethod": [ "POST", "PUT", "GET" ],
+          "AuthenticationOptions": {
+            "AuthenticationProviderKey": "IdentityApiKey",
+            "AllowedScopes": []
+          }
+        },
+        {
+          "DownstreamPathTemplate": "/{everything}",
+          "DownstreamScheme": "http",
+          "DownstreamHostAndPorts": [
+            {
+              "Host": "ordering.ordering",
+              "Port": 80
+            }
+          ],
+          "UpstreamPathTemplate": "/orders-api/{everything}",
+          "UpstreamHttpMethod": []
+        },
+        {
+          "DownstreamPathTemplate": "/{everything}",
+          "DownstreamScheme": "http",
+          "DownstreamHostAndPorts": [
+            {
+              "Host": "ordering-signalhub.ordering-signalhub",
+              "Port": 80
+            }
+          ],
+          "UpstreamPathTemplate": "/hub/{everything}",
+          "UpstreamHttpMethod": []
+        },
+        {
+          "DownstreamPathTemplate": "/{everything}",
+          "DownstreamScheme": "http",
+          "DownstreamHostAndPorts": [
+            {
+              "Host": "basket.basket",
+              "Port": 80
+            }
+          ],
+          "UpstreamPathTemplate": "/basket-api/{everything}",
+          "UpstreamHttpMethod": []
+        },
+        {
+          "DownstreamPathTemplate": "/{everything}",
+          "DownstreamScheme": "http",
+          "DownstreamHostAndPorts": [
+            {
+              "Host": "catalog.catalog",
+              "Port": 80
+            }
+          ],
+          "UpstreamPathTemplate": "/catalog-api/{everything}",
+          "UpstreamHttpMethod": []
+        },
+        {
+          "DownstreamPathTemplate": "/{everything}",
+          "DownstreamScheme": "http",
+          "DownstreamHostAndPorts": [
+            {
+              "Host": "payment.payment",
+              "Port": 80
+            }
+          ],
+          "UpstreamPathTemplate": "/payment-api/{everything}",
+          "UpstreamHttpMethod": []
+        }
+
+      ],
+        "GlobalConfiguration": {
+          "RequestIdKey": "OcRequestId",
+          "AdministrationPath": "/administration"
+        }
+      }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webshoppingapigw
+  namespace: webshoppingapigw
+spec:
+  selector:
+    matchLabels:
+      app: webshoppingapigw
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: webshoppingapigw
+    spec:
+      volumes:
+      - name: config-volume
+        configMap:
+          name: webshoppingapigw
+      containers:
+      - name: webshoppingapigw
+        image: dataconstruct/sdlc-example-infra-api-gateway-base:2a1752e290c661ed6c00a8bd2078629e29ac3534
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: config-volume
+          mountPath: /app/configuration
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "Development"
+        - name: IdentityUrl
+          value: "http://identity.identity"
+        - name: CatalogUrlHC
+          value: "http://catalog.catalog/hc"
+        - name: OrderingUrlHC
+          value: "http://ordering.ordering/hc"
+        - name: IdentityUrlHC
+          value: "http://identity.identity/hc"
+        - name: BasketUrlHC
+          value: "http://basket.basket/hc"
+        - name: MarketingUrlHC
+          value: "http://marketing.marketing/hc"
+        - name: PaymentUrlHC
+          value: "http://payment.payment/hc"
+        - name: LocationUrlHC
+          value: "http://locations.locations/hc"
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: webshoppingapigw
+  namespace: webshoppingapigw
+  annotations:  
+    kubernetes.io/ingress.class: nginx
+spec:
+  rules:
+  - host: eshop-webshoppingapigw.YOUR_HOST_HERE.com
+    http:
+      paths:
+      - backend:
+          serviceName: webshoppingapigw
+          servicePort: 80

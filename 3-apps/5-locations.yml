@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: locations
+  namespace: locations
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: locations
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: locations
+  namespace: locations
+spec:
+  selector:
+    matchLabels:
+      app: locations
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: locations
+    spec:
+      containers:
+      - name: locations
+        image: dataconstruct/sdlc-example-app-locations:79ef42a2d2ecec839472b300f01a81c57b5d9308
+        ports:
+        - containerPort: 80
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "Development"
+        - name: ASPNETCORE_URLS
+          value: "http://0.0.0.0:80"
+        - name: EventBusConnection
+          value: "rabbitmq.common-infra"
+        - name: AzureServiceBusEnabled
+          value: "False"
+        - name: ConnectionString
+          value: "mongodb://nosql-data.common-infra"

@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: sql-data
+  namespace: common-infra
+spec:
+  ports:
+  - port: 1433
+    targetPort: 1433
+  selector:
+    app: sql-data
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sql-data
+  namespace: common-infra
+  labels:
+    app: sql-data
+spec:
+  containers:
+  - name: sql-data
+    image: microsoft/mssql-server-linux:2017-latest
+    ports:
+    - containerPort: 1433
+    env:
+    - name: SA_PASSWORD
+      value: "Pass@word"
+    - name: ACCEPT_EULA
+      value: "Y"

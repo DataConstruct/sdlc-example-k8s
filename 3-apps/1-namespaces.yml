@@ -1,0 +1,91 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: identity
+  labels:
+    name: identity
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: basket
+  labels:
+    name: basket
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: catalog
+  labels:
+    name: catalog
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ordering
+  labels:
+    name: ordering
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ordering-background
+  labels:
+    name: ordering-background
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: marketing
+  labels:
+    name: marketing
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: payment
+  labels:
+    name: payment
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: locations
+  labels:
+    name: locations
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ordering-signalhub
+  labels:
+    name: ordering-signalhub
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: front-end
+  labels:
+    name: front-end
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: webshoppingapigw
+  labels:
+    name: webshoppingapigw
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: webmarketingapigw
+  labels:
+    name: webmarketingapigw
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: webshoppingagg
+  labels:
+    name: webshoppingagg
+    

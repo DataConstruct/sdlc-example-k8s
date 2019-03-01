@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ordering
+  namespace: ordering
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: ordering
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ordering
+  namespace: ordering
+spec:
+  selector:
+    matchLabels:
+      app: ordering
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: ordering
+    spec:
+      containers:
+      - name: ordering
+        image: dataconstruct/sdlc-example-app-ordering:a597dc1319af8ae21d631de78ab4cb758a541869
+        ports:
+        - containerPort: 80
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "Development"
+        - name: ASPNETCORE_URLS
+          value: "http://0.0.0.0:80"
+        - name: ConnectionString
+          value: "Server=sql-data.common-infra;Database=Microsoft.eShopOnContainers.Service.IdentityDb;User Id=sa;Password=Pass@word"
+        - name: EventBusConnection
+          value: "rabbitmq.common-infra"
+        - name: AzureServiceBusEnabled
+          value: "False"
+        - name: UseCustomizationData
+          value: "True"
+        - name: CheckUpdateTime
+          value: "30000"
+        - name: UseLoadTest
+          value: "False"

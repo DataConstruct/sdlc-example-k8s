@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ordering-signalhub
+  namespace: ordering-signalhub
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: ordering-signalhub
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ordering-signalhub
+  namespace: ordering-signalhub
+spec:
+  selector:
+    matchLabels:
+      app: ordering-signalhub
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: ordering-signalhub
+    spec:
+      containers:
+      - name: ordering-signalhub
+        image: dataconstruct/sdlc-example-app-ordering-signalhub:a597dc1319af8ae21d631de78ab4cb758a541869
+        ports:
+        - containerPort: 80
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "Development"
+        - name: ASPNETCORE_URLS
+          value: "http://0.0.0.0:80"
+        - name: EventBusConnection
+          value: "rabbitmq.common-infra"
+        - name: AzureServiceBusEnabled
+          value: "False"
